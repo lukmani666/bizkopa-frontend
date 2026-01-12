@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero pt-20">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero pt-20 pb-10">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div 
@@ -86,7 +86,7 @@ const HeroSection = () => {
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
               <Button size="lg" asChild className="h-12 px-8 text-base font-semibold">
-                <Link href="/auth/signup">
+                <Link href="/auth">
                   Start for Free
                   <motion.span
                     className="ml-2 inline-flex"

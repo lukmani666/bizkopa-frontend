@@ -25,16 +25,17 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/components/hooks/use-toast";
 import { Leaf, Mail, Lock, User } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 const signInSchema = z.object({
-  email: z.email({ message: 'Invalid email address' }).trim(),
+  email: z.string().trim().email({ message: 'Invalid email address' }),
   password: z.string().min(8, { message: 'Password must be at least 8 character' }),
 });
 
 const signUpSchema = z.object({
   first_name: z.string().trim().min(2, { message: 'First name must be at least 8 character' }).max(100),
   last_name: z.string().trim().min(2, { message: 'Last name must be at least 8 character' }).max(100),
-  email: z.email({ message: "Invalid email address" }).trim(),
+  email: z.string().trim().email({ message: 'Invalid email address' }),
   password: z.string().min(8, { message: 'Password must be at least 8 character' }),
   confirmPassword: z.string(),
 })
@@ -47,6 +48,8 @@ type SignInFormData = z.infer<typeof signInSchema>;
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function AuthPage() {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const router = useRouter();
   const { toast } = useToast();
   const { signIn, signUp, user, initialized } = useAuthStore();
@@ -63,9 +66,16 @@ export default function AuthPage() {
   });
 
   useEffect(() => {
-    if (initialized && user) {
-      router.push('/dashboard');
-    }
+    if (!initialized || !user) return;
+
+    // if (initialized && user) {
+    //   router.push('/dashboard');
+    // }
+    const safeRedirect =
+      redirect && redirect.startsWith('/')
+        ? redirect
+        : '/dashboard';
+    router.replace(safeRedirect);
   }, [user, initialized, router]);
 
   const handleSignIn = async (data: SignInFormData) => {
@@ -87,7 +97,7 @@ export default function AuthPage() {
         title: 'Welcome back!',
         description: 'You have successfully signed in.',
       });
-      router.push('/dashboard');
+      // router.push('/dashboard');
     }
   };
 
@@ -111,7 +121,7 @@ export default function AuthPage() {
         title: 'Account created!',
         description: 'Welcome to Bizkopa. You can now start using the platform.'
       });
-      router.push('/dashboard');
+      // router.push('/dashboard');
     }
   };
 
@@ -172,7 +182,7 @@ export default function AuthPage() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                     {isLoading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
@@ -235,7 +245,7 @@ export default function AuthPage() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full cursor-pointer" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create Account"}
                   </Button>
                 </form>

@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import Providers from "./providers";
-import NavbarFooterWrapper from "@/components/layout/navbarfooterwrapper";
+import { ThemeSync } from "@/components/theme-sync";
 
 
 const geistSans = Geist({
@@ -29,13 +29,40 @@ export default function RootLayout({
 }) {
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function () {
+              try {
+                const storedTheme = localStorage.getItem('bizkopa-theme');
+                const theme = storedTheme ? JSON.parse(storedTheme)?.state?.theme : 'system';
+
+                const root = document.documentElement;
+                root.classList.remove('light', 'dark');
+
+                if (theme === 'system') {
+                  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  root.classList.add(isDark ? 'dark' : 'light');
+                } else {
+                  root.classList.add(theme);
+                }
+              } catch (_) {}
+            })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <NavbarFooterWrapper>{children}</NavbarFooterWrapper>
-          {/* <main>{children}</main> */}
+          {/* <NavbarFooterWrapper>{children}</NavbarFooterWrapper> */}
+          <main>
+            <ThemeSync />
+            {children}
+          </main>
         </Providers>
       </body>
     </html>
